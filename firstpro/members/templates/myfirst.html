@@ -3,303 +3,424 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Student Portal Dashboard</title>
+    <title>NextGen University Portal</title>
     <link rel="templates" href="style.css" />
     <style>
-      /* Premium Modern Reset & Theme */
+      /* Deep Tech Neo-Minimalist Theme Variables */
       * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
         font-family:
-          "Inter",
           system-ui,
           -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Ubuntu,
+          Cantarell,
           sans-serif;
       }
 
       :root {
-        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-        --glass-bg: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --text-primary: #f8fafc;
-        --text-secondary: #94a3b8;
-        --accent-glow: #818cf8;
-        --accent-gradient: linear-gradient(90deg, #6366f1, #a855f7);
-        --danger-glow: #f43f5e;
+        --app-bg: #09090b;
+        --panel-bg: #141416;
+        --panel-border: #27272a;
+        --text-high: #f4f4f5;
+        --text-low: #a1a1aa;
+        --electric-purple: #a855f7;
+        --neon-blue: #3b82f6;
+        --emerald-green: #10b981;
       }
 
       body {
-        background: var(--bg-gradient);
-        color: var(--text-primary);
+        background-color: var(--app-bg);
+        color: var(--text-high);
         min-height: 100vh;
-        overflow-x: hidden;
       }
 
-      /* Glassmorphic Shell */
-      .dashboard-container {
+      /* Master Grid Structure Layout */
+      .portal-grid {
+        display: grid;
+        grid-template-columns: 240px 1fr 320px;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Branding Layout Panels */
+      .nav-sidebar {
+        background-color: var(--panel-bg);
+        border-right: 1px solid var(--panel-border);
+        padding: 24px;
+      }
+
+      .brand-logo {
         display: flex;
-        min-height: 100vh;
-        padding: 20px;
-        gap: 20px;
-      }
-
-      /* Floating Sidebar Nav */
-      .sidebar {
-        width: 260px;
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 30px 20px;
-      }
-
-      .sidebar .logo {
-        font-size: 22px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        background: var(--accent-gradient);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        font-size: 18px;
         margin-bottom: 40px;
       }
 
-      .sidebar nav ul {
-        list-style: none;
+      .logo-icon {
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(
+          135deg,
+          var(--electric-purple),
+          var(--neon-blue)
+        );
+        border-radius: 6px;
       }
 
-      .sidebar nav ul li {
-        margin-bottom: 10px;
-      }
-
-      .sidebar nav ul li a {
-        color: var(--text-secondary);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-radius: 12px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-      }
-
-      .sidebar nav ul li a:hover,
-      .sidebar nav ul li a.active {
-        background: rgba(255, 255, 255, 0.07);
-        color: var(--text-primary);
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      }
-
-      /* Main Dashboard Arena */
-      .main-content {
-        flex-grow: 1;
+      .nav-menu {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 8px;
       }
 
-      .top-header h1 {
-        font-size: 28px;
-        font-weight: 700;
-        letter-spacing: -0.5px;
-      }
-
-      .user-profile {
+      .menu-item {
+        color: var(--text-low);
+        text-decoration: none;
+        padding: 12px;
+        border-radius: 8px;
         font-size: 14px;
-        color: var(--text-secondary);
-        margin-top: 4px;
-      }
-
-      /* Glass Metrics Cards Grid */
-      .metrics-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-      }
-
-      .card {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        padding: 24px;
-        border-radius: 16px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 3px;
-        background: var(--accent-gradient);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      .card:hover::before {
-        opacity: 1;
-      }
-
-      .card h3 {
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: var(--text-secondary);
-        margin-bottom: 12px;
-      }
-
-      .card .stat {
-        font-size: 32px;
-        font-weight: 700;
-        letter-spacing: -1px;
-      }
-
-      /* Modern Minimalist Table Block */
-      .course-section {
-        background: var(--glass-bg);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        border-radius: 16px;
-        padding: 24px;
-      }
-
-      .course-section h2 {
-        font-size: 20px;
-        margin-bottom: 20px;
-      }
-
-      .course-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .course-table th {
-        color: var(--text-secondary);
-        font-size: 13px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 16px;
-        border-bottom: 1px solid var(--glass-border);
-      }
-
-      .course-table td {
-        padding: 18px 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        font-size: 15px;
-      }
-
-      /* Neon Pill Action Buttons */
-      .btn-drop {
-        background: rgba(244, 63, 94, 0.1);
-        color: var(--danger-glow);
-        border: 1px solid rgba(244, 63, 94, 0.2);
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
+        font-weight: 500;
         transition: all 0.2s ease;
       }
 
-      .btn-drop:hover {
-        background: var(--danger-glow);
-        color: white;
-        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+      .menu-item:hover,
+      .menu-item.active {
+        background-color: #1e1e22;
+        color: var(--text-high);
+      }
+
+      /* Central Main Hub Workspace Container */
+      .workspace {
+        padding: 40px;
+        overflow-y: auto;
+      }
+
+      .workspace-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+      }
+
+      .subtitle {
+        color: var(--text-low);
+        margin-top: 4px;
+        font-size: 14px;
+      }
+
+      .badge-status {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: var(--emerald-green);
+        padding: 6px 12px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      /* Visual Statistics Widgets Blocks */
+      .dashboard-widgets {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+
+      .widget-card {
+        background-color: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 24px;
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .card-header h3 {
+        font-size: 14px;
+        color: var(--text-low);
+        font-weight: 500;
+      }
+
+      .percentage,
+      .status-clear {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--neon-blue);
+      }
+
+      .status-clear {
+        color: var(--emerald-green);
+      }
+
+      .progress-bar-container {
+        height: 6px;
+        background-color: #27272a;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--neon-blue),
+          var(--electric-purple)
+        );
+      }
+
+      .amount-display {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      .amount-display .subtext {
+        font-size: 14px;
+        color: var(--text-low);
+        font-weight: 400;
+      }
+
+      .card-footer {
+        font-size: 12px;
+        color: var(--text-low);
+      }
+
+      /* Card-Based Multi-Column Layout List Alternate */
+      .content-section h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+      }
+
+      .course-cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+      }
+
+      .course-panel {
+        background-color: var(--panel-bg);
+        border: 1px solid var(--panel-border);
+        border-radius: 12px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: transform 0.2s ease;
+      }
+
+      .course-panel:hover {
+        transform: translateY(-2px);
+        border-color: #3f3f46;
+      }
+
+      .panel-tag {
+        background-color: #27272a;
+        display: inline-block;
+        align-self: flex-start;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-low);
+      }
+
+      .course-panel h3 {
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .prof-name {
+        font-size: 13px;
+        color: var(--text-low);
+      }
+
+      .panel-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 8px;
+        font-size: 12px;
+        color: var(--text-low);
+      }
+
+      /* Minimalist text button trigger alternative */
+      .action-link-btn {
+        background: none;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-weight: 500;
+      }
+
+      .action-link-btn:hover {
+        text-decoration: underline;
+      }
+
+      /* Utility Control Panel Right Column Blueprint */
+      .control-panel {
+        background-color: var(--panel-bg);
+        border-left: 1px solid var(--panel-border);
+        padding: 40px 24px;
+      }
+
+      .control-panel h3 {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .task-item {
+        background-color: #1c1c1e;
+        padding: 16px;
+        border-radius: 8px;
+        border-left: 4px solid transparent;
+      }
+
+      .border-purple {
+        border-left-color: var(--electric-purple);
+      }
+      .border-blue {
+        border-left-color: var(--neon-blue);
+      }
+
+      .task-item h4 {
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+
+      .task-item p {
+        font-size: 12px;
+        color: var(--text-low);
       }
     </style>
   </head>
-
   <body>
-    <div class="dashboard-container">
-      <!-- Sidebar Navigation -->
-      <aside class="sidebar">
-        <div class="logo">EduPortal</div>
-        <nav>
-          <ul>
-            <li><a href="#" class="active">Dashboard</a></li>
-            <li><a href="#">Courses</a></li>
-            <li><a href="#">Grades</a></li>
-            <li><a href="#">Schedule</a></li>
-          </ul>
+    <div class="portal-grid">
+      <!-- Modern Minimalist Sidebar -->
+      <aside class="nav-sidebar">
+        <div class="brand-logo">
+          <div class="logo-icon"></div>
+          <span>My University</span>
+        </div>
+        <nav class="nav-menu">
+          <a href="#" class="menu-item active">Overview</a>
+          <a href="#" class="menu-item">Academics</a>
+          <a href="#" class="menu-item">Financials</a>
+          <a href="#" class="menu-item">Campus Life</a>
         </nav>
       </aside>
 
-      <!-- Main Content Area -->
-      <main class="main-content">
-        <header class="top-header">
-          <h1>Welcome Back, Sunny!</h1>
-          <div class="user-profile">ID: #2026094</div>
+      <!-- Main Workspace Area -->
+      <main class="workspace">
+        <header class="workspace-header">
+          <div>
+            <h1>Welcome, Sunny!</h1>
+            <p class="subtitle">B.Tech AI&DS • Semester 5</p>
+          </div>
+          <div class="header-actions">
+            <span class="badge-status">Active Term</span>
+          </div>
         </header>
 
-        <!-- Metrics Grid -->
-        <section class="metrics-grid">
-          <div class="card">
-            <h3>Current GPA</h3>
-            <p class="stat">3.85</p>
+        <!-- Interactive Widgets Area -->
+        <div class="dashboard-widgets">
+          <!-- Academic Progress Card -->
+          <div class="widget-card project-card">
+            <div class="card-header">
+              <h3>Attendance Tracker</h3>
+              <span class="percentage">88%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-fill" style="width: 88%"></div>
+            </div>
+            <p class="card-footer">
+              Next class: Advanced Analytics at 10:00 AM
+            </p>
           </div>
-          <div class="card">
-            <h3>Credits Earned</h3>
-            <p class="stat">42 / 120</p>
-          </div>
-          <div class="card">
-            <h3>Registered Courses</h3>
-            <p class="stat" id="course-count">3</p>
-          </div>
-        </section>
 
-        <!-- Course Schedule Section -->
-        <section class="course-section">
-          <h2>Your Enrolled Courses</h2>
-          <div class="table-responsive">
-            <table class="course-table">
-              <thead>
-                <tr>
-                  <th>Course Code</th>
-                  <th>Course Name</th>
-                  <th>Professor</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="course-list">
-                <tr>
-                  <td>CS-101</td>
-                  <td>Introduction to Computer Science</td>
-                  <td>Dr. Smith</td>
-                  <td>
-                    <button class="btn-drop" onclick="dropCourse(this)">
-                      Drop
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>MATH-201</td>
-                  <td>Calculus II</td>
-                  <td>Prof. Davis</td>
-                  <td>
-                    <button class="btn-drop" onclick="dropCourse(this)">
-                      Drop
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>ENG-102</td>
-                  <td>Composition & Literature</td>
-                  <td>Dr. Jones</td>
-                  <td>
-                    <button class="btn-drop" onclick="dropCourse(this)">
-                      Drop
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Financial Status Card -->
+          <div class="widget-card project-card">
+            <div class="card-header">
+              <h3>Term Financials</h3>
+              <span class="status-clear">Clear</span>
+            </div>
+            <div class="amount-display">
+              ₹0.00 <span class="subtext">Due Balance</span>
+            </div>
+            <p class="card-footer">Next billing cycle: July 2026</p>
+          </div>
+        </div>
+
+        <!-- Modern Card-Based Course Catalog List -->
+        <section class="content-section">
+          <h2>Active Academic Tracks</h2>
+          <div class="course-cards-container" id="course-container">
+            <!-- Course Card 1 -->
+            <div class="course-panel" id="course-cs101">
+              <div class="panel-tag">CS-402</div>
+              <h3>Machine Learning Basics</h3>
+              <p class="prof-name">with Dr. Evelyn Harper</p>
+              <div class="panel-meta">
+                <span>4 Credits</span>
+                <button
+                  class="action-link-btn"
+                  onclick="dropActiveTrack('course-cs101')"
+                >
+                  Drop Track
+                </button>
+              </div>
+            </div>
+
+            <!-- Course Card 2 -->
+            <div class="course-panel" id="course-math201">
+              <div class="panel-tag">MATH-302</div>
+              <h3>Discrete Mathematics</h3>
+              <p class="prof-name">with Prof. Alan Turing</p>
+              <div class="panel-meta">
+                <span>3 Credits</span>
+                <button
+                  class="action-link-btn"
+                  onclick="dropActiveTrack('course-math201')"
+                >
+                  Drop Track
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       </main>
+
+      <!-- Right Side Utility Control Center Panel -->
+      <aside class="control-panel">
+        <h3>Upcoming Tasks</h3>
+        <div class="task-list">
+          <div class="task-item border-purple">
+            <h4>Lab Assessment 3</h4>
+            <p>Machine Learning • Due in 2 days</p>
+          </div>
+          <div class="task-item border-blue">
+            <h4>Project Submission</h4>
+            <p>Discrete Math • Due Friday</p>
+          </div>
+        </div>
+      </aside>
     </div>
     <script src="script.js"></script>
   </body>
