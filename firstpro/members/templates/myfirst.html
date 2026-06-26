@@ -1,7 +1,306 @@
 <!doctype html>
-<html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Portal Dashboard</title>
+    <link rel="templates" href="style.css" />
+    <style>
+      /* Premium Modern Reset & Theme */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+
+      :root {
+        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --glass-border: rgba(255, 255, 255, 0.08);
+        --text-primary: #f8fafc;
+        --text-secondary: #94a3b8;
+        --accent-glow: #818cf8;
+        --accent-gradient: linear-gradient(90deg, #6366f1, #a855f7);
+        --danger-glow: #f43f5e;
+      }
+
+      body {
+        background: var(--bg-gradient);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Glassmorphic Shell */
+      .dashboard-container {
+        display: flex;
+        min-height: 100vh;
+        padding: 20px;
+        gap: 20px;
+      }
+
+      /* Floating Sidebar Nav */
+      .sidebar {
+        width: 260px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 30px 20px;
+      }
+
+      .sidebar .logo {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 40px;
+      }
+
+      .sidebar nav ul {
+        list-style: none;
+      }
+
+      .sidebar nav ul li {
+        margin-bottom: 10px;
+      }
+
+      .sidebar nav ul li a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar nav ul li a:hover,
+      .sidebar nav ul li a.active {
+        background: rgba(255, 255, 255, 0.07);
+        color: var(--text-primary);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      }
+
+      /* Main Dashboard Arena */
+      .main-content {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .top-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+
+      .user-profile {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+
+      /* Glass Metrics Cards Grid */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+      }
+
+      .card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        padding: 24px;
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: var(--accent-gradient);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .card:hover::before {
+        opacity: 1;
+      }
+
+      .card h3 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        margin-bottom: 12px;
+      }
+
+      .card .stat {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: -1px;
+      }
+
+      /* Modern Minimalist Table Block */
+      .course-section {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 24px;
+      }
+
+      .course-section h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+
+      .course-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .course-table th {
+        color: var(--text-secondary);
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 16px;
+        border-bottom: 1px solid var(--glass-border);
+      }
+
+      .course-table td {
+        padding: 18px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 15px;
+      }
+
+      /* Neon Pill Action Buttons */
+      .btn-drop {
+        background: rgba(244, 63, 94, 0.1);
+        color: var(--danger-glow);
+        border: 1px solid rgba(244, 63, 94, 0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-drop:hover {
+        background: var(--danger-glow);
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 63, 94, 0.3);
+      }
+    </style>
+  </head>
+
   <body>
-    <h1>Hello World!</h1>
-    <p>Welcome to my Django</p>
+    <div class="dashboard-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="logo">EduPortal</div>
+        <nav>
+          <ul>
+            <li><a href="#" class="active">Dashboard</a></li>
+            <li><a href="#">Courses</a></li>
+            <li><a href="#">Grades</a></li>
+            <li><a href="#">Schedule</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <header class="top-header">
+          <h1>Welcome Back, Sunny!</h1>
+          <div class="user-profile">ID: #2026094</div>
+        </header>
+
+        <!-- Metrics Grid -->
+        <section class="metrics-grid">
+          <div class="card">
+            <h3>Current GPA</h3>
+            <p class="stat">3.85</p>
+          </div>
+          <div class="card">
+            <h3>Credits Earned</h3>
+            <p class="stat">42 / 120</p>
+          </div>
+          <div class="card">
+            <h3>Registered Courses</h3>
+            <p class="stat" id="course-count">3</p>
+          </div>
+        </section>
+
+        <!-- Course Schedule Section -->
+        <section class="course-section">
+          <h2>Your Enrolled Courses</h2>
+          <div class="table-responsive">
+            <table class="course-table">
+              <thead>
+                <tr>
+                  <th>Course Code</th>
+                  <th>Course Name</th>
+                  <th>Professor</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="course-list">
+                <tr>
+                  <td>CS-101</td>
+                  <td>Introduction to Computer Science</td>
+                  <td>Dr. Smith</td>
+                  <td>
+                    <button class="btn-drop" onclick="dropCourse(this)">
+                      Drop
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>MATH-201</td>
+                  <td>Calculus II</td>
+                  <td>Prof. Davis</td>
+                  <td>
+                    <button class="btn-drop" onclick="dropCourse(this)">
+                      Drop
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>ENG-102</td>
+                  <td>Composition & Literature</td>
+                  <td>Dr. Jones</td>
+                  <td>
+                    <button class="btn-drop" onclick="dropCourse(this)">
+                      Drop
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="script.js"></script>
   </body>
 </html>
