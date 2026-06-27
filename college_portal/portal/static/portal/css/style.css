@@ -1,0 +1,115 @@
+:root {
+  --primary-blue: #0d47a1;
+  --light-blue: #1565c0;
+  --pale-blue: #e3f2fd;
+  --white: #ffffff;
+  --text-dark: #1a1a1a;
+}
+
+body {
+  background-color: var(--pale-blue);
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--text-dark);
+}
+
+.navbar-custom {
+  background-color: var(--primary-blue);
+}
+.navbar-custom .nav-link {
+  color: #f0f4ff;
+}
+.navbar-custom .nav-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.footer-custom {
+  background-color: var(--primary-blue);
+  color: #f0f4ff;
+}
+
+.hero-section {
+  background-color: var(--white);
+  padding: 60px 20px;
+  border-bottom: 3px solid var(--primary-blue);
+}
+.hero-icon {
+  font-size: 4rem;
+  color: var(--primary-blue);
+}
+
+.card-custom {
+  border: 1px solid var(--light-blue);
+  border-radius: 10px;
+  background-color: var(--white);
+}
+.icon-blue {
+  font-size: 2.2rem;
+  color: var(--primary-blue);
+}
+
+.btn-primary-custom {
+  background-color: var(--primary-blue);
+  color: #fff;
+  border: none;
+}
+.btn-primary-custom:hover {
+  background-color: var(--light-blue);
+  color: #fff;
+}
+
+.btn-outline-primary-custom {
+  background-color: transparent;
+  color: var(--primary-blue);
+  border: 1px solid var(--primary-blue);
+}
+.btn-outline-primary-custom:hover {
+  background-color: var(--primary-blue);
+  color: #fff;
+}
+
+.form-container {
+  background-color: var(--white);
+  border-radius: 10px;
+  padding: 30px;
+  border: 1px solid var(--light-blue);
+}
+
+.sidebar-custom {
+  background-color: var(--primary-blue);
+  min-height: 100%;
+  color: #fff;
+}
+.sidebar-custom a {
+  color: #f0f4ff;
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  border-radius: 6px;
+}
+.sidebar-custom a:hover,
+.sidebar-custom a.active {
+  background-color: var(--light-blue);
+  color: #fff;
+}
+
+.section-heading {
+  color: var(--primary-blue);
+  border-bottom: 2px solid var(--primary-blue);
+  padding-bottom: 8px;
+  margin-bottom: 20px;
+}
+
+.table-custom thead {
+  background-color: var(--primary-blue);
+  color: #fff;
+}
+
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 40px 10px;
+  }
+  .hero-icon {
+    font-size: 3rem;
+  }
+}
