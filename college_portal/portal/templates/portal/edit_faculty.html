@@ -52,20 +52,66 @@
                 <div class="mb-3">
                   <label class="form-label fw-semibold">Department</label>
                   <select name="department" class="form-select" required>
-                    {% for d in "CSE ECE EEE MECH CIVIL".split %}
                     <option
-                      value="{{ d }}"
+                      value="CSE"
                       {%
                       if
                       faculty.department=""
-                      ="d"
+                      ="CSE"
                       %}selected{%
                       endif
                       %}
                     >
-                      {{ d }}
+                      CSE
                     </option>
-                    {% endfor %}
+                    <option
+                      value="ECE"
+                      {%
+                      if
+                      faculty.department=""
+                      ="ECE"
+                      %}selected{%
+                      endif
+                      %}
+                    >
+                      ECE
+                    </option>
+                    <option
+                      value="EEE"
+                      {%
+                      if
+                      faculty.department=""
+                      ="EEE"
+                      %}selected{%
+                      endif
+                      %}
+                    >
+                      EEE
+                    </option>
+                    <option
+                      value="MECH"
+                      {%
+                      if
+                      faculty.department=""
+                      ="MECH"
+                      %}selected{%
+                      endif
+                      %}
+                    >
+                      MECH
+                    </option>
+                    <option
+                      value="CIVIL"
+                      {%
+                      if
+                      faculty.department=""
+                      ="CIVIL"
+                      %}selected{%
+                      endif
+                      %}
+                    >
+                      CIVIL
+                    </option>
                   </select>
                 </div>
                 <div class="mb-3">
