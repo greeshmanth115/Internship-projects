@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
+#students
 class Student(models.Model):
     user        = models.OneToOneField(User, on_delete=models.CASCADE)
     name        = models.CharField(max_length=100)
@@ -17,7 +17,7 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.name} ({self.roll_number})"
 
-
+#faculty
 class Faculty(models.Model):
     user        = models.OneToOneField(User, on_delete=models.CASCADE)
     name        = models.CharField(max_length=100)
@@ -32,7 +32,7 @@ class Faculty(models.Model):
     class Meta:
         verbose_name_plural = "Faculty"
 
-
+#cource
 class Course(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20, unique=True)
@@ -40,7 +40,7 @@ class Course(models.Model):
     def __str__(self):
         return f"{self.name} ({self.code})"
 
-
+#subject
 class Subject(models.Model):
     name    = models.CharField(max_length=100)
     faculty = models.ForeignKey(Faculty, on_delete=models.SET_NULL, null=True, blank=True, related_name='subjects')
@@ -49,7 +49,7 @@ class Subject(models.Model):
     def __str__(self):
         return self.name
 
-
+#marks
 class Marks(models.Model):
     student  = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='marks')
     subject  = models.ForeignKey(Subject, on_delete=models.CASCADE)
@@ -67,7 +67,7 @@ class Marks(models.Model):
         unique_together = ('student', 'subject')
         verbose_name_plural = "Marks"
 
-
+#attendence
 class Attendance(models.Model):
     student    = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='attendance')
     subject    = models.ForeignKey(Subject, on_delete=models.CASCADE)
@@ -87,7 +87,7 @@ class Attendance(models.Model):
         unique_together = ('student', 'subject')
         verbose_name_plural = "Attendance"
 
-
+#notice
 class Notice(models.Model):
     title   = models.CharField(max_length=200)
     content = models.TextField()
@@ -96,7 +96,7 @@ class Notice(models.Model):
     def __str__(self):
         return self.title
 
-
+#timetable
 class Timetable(models.Model):
     DAYS = [
         ('Monday','Monday'), ('Tuesday','Tuesday'), ('Wednesday','Wednesday'),
