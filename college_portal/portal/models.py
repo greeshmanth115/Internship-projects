@@ -114,3 +114,26 @@ class Timetable(models.Model):
 
     def __str__(self):
         return f"{self.branch} Y{self.year} - {self.day}"
+    
+class CourseRegistration(models.Model):
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='registrations')
+    course  = models.ForeignKey(Course, on_delete=models.CASCADE)
+    registered_on = models.DateField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'course')
+
+    def __str__(self):
+        return f"{self.student.name} - {self.course.name}"
+    
+class DailyAttendance(models.Model):
+    student  = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='daily_attendance')
+    subject  = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    date     = models.DateField()
+    is_present = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('student', 'subject', 'date')
+
+    def __str__(self):
+        return f"{self.student.name} - {self.subject.name} - {self.date}"

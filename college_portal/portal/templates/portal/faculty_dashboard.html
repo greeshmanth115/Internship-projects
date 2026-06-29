@@ -107,7 +107,9 @@
               >{{ s.name }}</span
             >
             {% empty %}
-            <p class="text-muted">No subjects assigned.</p>
+            <p class="text-muted">
+              No subjects assigned. Ask admin to assign subjects.
+            </p>
             {% endfor %}
           </div>
         </div>
@@ -164,8 +166,8 @@
                   <tr>
                     <th>Student</th>
                     <th>Subject</th>
-                    <th>Internal</th>
-                    <th>External</th>
+                    <th>Internal (0-30)</th>
+                    <th>External (0-70)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -177,6 +179,7 @@
                         name="subject_{{ s.id }}"
                         class="form-select form-select-sm"
                       >
+                        <option value="">Select Subject</option>
                         {% for sub in subjects %}
                         <option value="{{ sub.id }}">{{ sub.name }}</option>
                         {% endfor %}
@@ -222,74 +225,135 @@
         </div>
       </div>
 
-      <!-- Attendance Entry -->
+      <!-- Daily Attendance Entry -->
       <div id="attendance-entry" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
-            <i class="bi bi-calendar-check me-2"></i>Attendance Entry
+            <i class="bi bi-calendar-check me-2"></i>Daily Attendance Entry
           </p>
+
           <form method="POST" action="{% url 'save_attendance' %}">
             {% csrf_token %}
+
+            <!-- Select Subject and Date -->
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Select Subject</label>
+                <select name="subject_id" class="form-select" required>
+                  <option value="">Choose Subject</option>
+                  {% for sub in subjects %}
+                  <option value="{{ sub.id }}">{{ sub.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">Date</label>
+                <input
+                  type="date"
+                  name="date"
+                  class="form-control"
+                  required
+                  value="{% now 'Y-m-d' %}"
+                />
+              </div>
+            </div>
+
+            <!-- Present / Absent Table -->
             <div class="table-responsive">
               <table class="table table-bordered text-center">
                 <thead>
                   <tr>
+                    <th>#</th>
                     <th>Student</th>
-                    <th>Subject</th>
-                    <th>Present (days)</th>
-                    <th>Total (days)</th>
+                    <th>Roll No</th>
+                    <th class="text-success">Present</th>
+                    <th class="text-danger">Absent</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for s in students %}
                   <tr>
-                    <td>{{ s.name }} ({{ s.roll_number }})</td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ s.name }}</td>
+                    <td>{{ s.roll_number }}</td>
                     <td>
-                      <select
-                        name="att_subject_{{ s.id }}"
-                        class="form-select form-select-sm"
-                      >
-                        {% for sub in subjects %}
-                        <option value="{{ sub.id }}">{{ sub.name }}</option>
-                        {% endfor %}
-                      </select>
+                      <div class="form-check d-flex justify-content-center">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="present_{{ s.id }}"
+                          value="1"
+                          required
+                        />
+                      </div>
                     </td>
                     <td>
-                      <input
-                        type="number"
-                        name="present_{{ s.id }}"
-                        class="form-control form-control-sm"
-                        min="0"
-                        placeholder="e.g. 20"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        name="total_{{ s.id }}"
-                        class="form-control form-control-sm"
-                        min="0"
-                        placeholder="e.g. 24"
-                      />
+                      <div class="form-check d-flex justify-content-center">
+                        <input
+                          class="form-check-input"
+                          type="radio"
+                          name="present_{{ s.id }}"
+                          value="0"
+                          required
+                        />
+                      </div>
                     </td>
                   </tr>
                   {% empty %}
                   <tr>
-                    <td colspan="4" class="text-muted">No students found.</td>
+                    <td colspan="5" class="text-muted">No students found.</td>
                   </tr>
                   {% endfor %}
                 </tbody>
               </table>
             </div>
+
             {% if students %}
             <button type="submit" class="btn btn-primary mt-2">
               <i class="bi bi-save me-2"></i>Save Attendance
             </button>
             {% endif %}
           </form>
+
+          <!-- Recent Attendance Records -->
+          {% if attendance_records %}
+          <hr class="my-4" />
+          <p class="section-title">
+            <i class="bi bi-clock-history me-2"></i>Recent Attendance Records
+          </p>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Subject</th>
+                  <th>Student</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in attendance_records %}
+                <tr>
+                  <td>{{ r.date }}</td>
+                  <td>{{ r.subject.name }}</td>
+                  <td>{{ r.student.name }}</td>
+                  <td>
+                    {% if r.is_present %}
+                    <span class="badge bg-success">Present</span>
+                    {% else %}
+                    <span class="badge bg-danger">Absent</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
+    <!-- end main-content -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'portal/js/script.js' %}"></script>

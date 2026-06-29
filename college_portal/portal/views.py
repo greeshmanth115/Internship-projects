@@ -1,4 +1,4 @@
-
+from .models import Student, Faculty, Course, Subject, Marks, Attendance, Notice, Timetable, CourseRegistration
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -7,6 +7,7 @@ from django.contrib import messages
 
 from .models import Student, Faculty, Course, Subject, Marks, Attendance, Notice, Timetable
 from .forms  import SignupForm, LoginForm
+from .models import Student, Faculty, Course, Subject, Marks, Attendance, Notice, Timetable, CourseRegistration, DailyAttendance
 
 
 # HOME
@@ -74,28 +75,46 @@ def logout_view(request):
 # STUDENT DASHBOARD
 @login_required(login_url='login')
 def student_dashboard(request):
-    student    = get_object_or_404(Student, user=request.user)
-    marks      = Marks.objects.filter(student=student)
-    attendance = Attendance.objects.filter(student=student)
-    courses    = Course.objects.all()
-    timetable  = Timetable.objects.filter(branch=student.branch, year=student.year)
-    notices    = Notice.objects.all().order_by('-date')[:6]
-    marks_data = [{'subject': m.subject.name,'internal': m.internal,'external': m.external,'total': m.total} for m in marks]
-    att_data   = [{'subject': a.subject.name,'percentage': a.percentage} for a in attendance]
+    student     = get_object_or_404(Student, user=request.user)
+    marks       = Marks.objects.filter(student=student)
+    attendance  = Attendance.objects.filter(student=student)
+    registered  = CourseRegistration.objects.filter(student=student).select_related('course')
+    all_courses = Course.objects.exclude(id__in=registered.values_list('course_id', flat=True))
+    notices     = Notice.objects.all().order_by('-date')[:6]
+
+    # Auto-generate timetable from subjects linked to student's branch
+    subjects    = Subject.objects.filter(course__in=registered.values_list('course_id', flat=True))
+
+    marks_data = [{'subject': m.subject.name, 'internal': m.internal,
+                   'external': m.external, 'total': m.total} for m in marks]
+    att_data   = [{'subject': a.subject.name, 'percentage': a.percentage} for a in attendance]
+
     return render(request, 'portal/student_dashboard.html', {
-        'student': student, 'marks': marks_data, 'attendance': att_data,
-        'courses': courses, 'timetable': timetable, 'notices': notices,
+        'student':      student,
+        'marks':        marks_data,
+        'attendance':   att_data,
+        'registered':   registered,
+        'all_courses':  all_courses,
+        'subjects':     subjects,
+        'notices':      notices,
     })
 
 
 # FACULTY DASHBOARD
 @login_required(login_url='login')
 def faculty_dashboard(request):
-    faculty  = get_object_or_404(Faculty, user=request.user)
-    subjects = Subject.objects.filter(faculty=faculty)
-    students = Student.objects.filter(branch=faculty.department)
+    faculty            = get_object_or_404(Faculty, user=request.user)
+    subjects           = Subject.objects.filter(faculty=faculty)
+    students           = Student.objects.filter(branch=faculty.department)
+    attendance_records = DailyAttendance.objects.filter(
+                             subject__faculty=faculty
+                         ).order_by('-date')[:20]
+
     return render(request, 'portal/faculty_dashboard.html', {
-        'faculty': faculty, 'subjects': subjects, 'students': students,
+        'faculty':            faculty,
+        'subjects':           subjects,
+        'students':           students,
+        'attendance_records': attendance_records,
     })
 
 
@@ -121,19 +140,29 @@ def save_marks(request):
 @login_required(login_url='login')
 def save_attendance(request):
     if request.method == 'POST':
-        faculty  = get_object_or_404(Faculty, user=request.user)
-        students = Student.objects.filter(branch=faculty.department)
-        for s in students:
-            subject_id = request.POST.get(f'att_subject_{s.id}')
-            present    = request.POST.get(f'present_{s.id}', 0)
-            total      = request.POST.get(f'total_{s.id}', 0)
-            if subject_id:
-                subject = get_object_or_404(Subject, id=subject_id)
-                Attendance.objects.update_or_create(student=s, subject=subject,
-                    defaults={'present': int(present), 'total': int(total)})
-        messages.success(request, 'Attendance saved.')
-    return redirect('faculty_dashboard')
+        faculty    = get_object_or_404(Faculty, user=request.user)
+        subject_id = request.POST.get('subject_id')
+        date       = request.POST.get('date')
+        students   = Student.objects.filter(branch=faculty.department)
+        subject    = get_object_or_404(Subject, id=subject_id)
 
+        for s in students:
+            value      = request.POST.get(f'present_{s.id}', '0')
+            is_present = value == '1'   # 1 = Present, 0 = Absent
+
+            DailyAttendance.objects.update_or_create(
+                student=s, subject=subject, date=date,
+                defaults={'is_present': is_present}
+            )
+            total   = DailyAttendance.objects.filter(student=s, subject=subject).count()
+            present = DailyAttendance.objects.filter(student=s, subject=subject, is_present=True).count()
+            Attendance.objects.update_or_create(
+                student=s, subject=subject,
+                defaults={'present': present, 'total': total}
+            )
+
+        messages.success(request, f'Attendance saved for {date}.')
+    return redirect('faculty_dashboard')
 
 # ADMIN DASHBOARD
 @login_required(login_url='login')
@@ -250,4 +279,39 @@ def delete_course(request, pk):
     if not request.user.is_staff: return redirect('login')
     course = get_object_or_404(Course, id=pk)
     course.delete(); messages.success(request, 'Course deleted.')
+    return redirect('admin_dashboard')
+
+@login_required(login_url='login')
+def register_course(request):
+    if request.method == 'POST':
+        student   = get_object_or_404(Student, user=request.user)
+        course_id = request.POST.get('course_id')
+        action    = request.POST.get('action')
+        course    = get_object_or_404(Course, id=course_id)
+
+        if action == 'register':
+            CourseRegistration.objects.get_or_create(student=student, course=course)
+            messages.success(request, f'Registered for {course.name}.')
+        elif action == 'drop':
+            CourseRegistration.objects.filter(student=student, course=course).delete()
+            messages.success(request, f'Dropped {course.name}.')
+
+    return redirect('student_dashboard')
+
+@login_required(login_url='login')
+def assign_subject(request):
+    if not request.user.is_staff:
+        return redirect('login')
+    if request.method == 'POST':
+        faculty_id   = request.POST.get('faculty_id')
+        subject_name = request.POST.get('subject_name')
+        course_id    = request.POST.get('course_id')
+        faculty      = get_object_or_404(Faculty, id=faculty_id)
+        course       = get_object_or_404(Course, id=course_id)
+        Subject.objects.create(
+            name=subject_name,
+            faculty=faculty,
+            course=course,
+        )
+        messages.success(request, f'Subject "{subject_name}" assigned to {faculty.name}.')
     return redirect('admin_dashboard')

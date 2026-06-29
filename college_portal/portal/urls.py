@@ -22,4 +22,6 @@ urlpatterns = [
     path('admin-panel/faculty/delete/<int:pk>/',  views.delete_faculty,   name='delete_faculty'),
     path('admin-panel/course/add/',               views.add_course,       name='add_course'),
     path('admin-panel/course/delete/<int:pk>/',   views.delete_course,    name='delete_course'),
+    path('student/course/', views.register_course, name='register_course'),
+    path('admin-panel/subject/assign/', views.assign_subject, name='assign_subject'),
 ]

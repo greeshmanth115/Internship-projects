@@ -194,10 +194,64 @@
       </div>
 
       <!-- Courses -->
+      <!-- Registered Courses -->
       <div id="courses" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
             <i class="bi bi-book me-2"></i>Registered Courses
+          </p>
+
+          <!-- Already registered -->
+          <div class="table-responsive mb-4">
+            <table class="table table-bordered table-hover text-center">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Course Name</th>
+                  <th>Course Code</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in registered %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ r.course.name }}</td>
+                  <td>{{ r.course.code }}</td>
+                  <td>
+                    <form method="POST" action="{% url 'register_course' %}">
+                      {% csrf_token %}
+                      <input
+                        type="hidden"
+                        name="course_id"
+                        value="{{ r.course.id }}"
+                      />
+                      <input type="hidden" name="action" value="drop" />
+                      <button
+                        type="submit"
+                        class="btn btn-danger btn-sm"
+                        onclick="return confirm('Drop this course?');"
+                      >
+                        <i class="bi bi-x-circle me-1"></i>Drop
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="4" class="text-muted">
+                    No courses registered yet.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Available courses to register -->
+          {% if all_courses %}
+          <p class="section-title">
+            <i class="bi bi-plus-circle me-2"></i>Available Courses
           </p>
           <div class="table-responsive">
             <table class="table table-bordered table-hover text-center">
@@ -206,60 +260,68 @@
                   <th>#</th>
                   <th>Course Name</th>
                   <th>Course Code</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                {% for c in courses %}
+                {% for c in all_courses %}
                 <tr>
                   <td>{{ forloop.counter }}</td>
                   <td>{{ c.name }}</td>
                   <td>{{ c.code }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="3" class="text-muted">No courses registered.</td>
+                  <td>
+                    <form method="POST" action="{% url 'register_course' %}">
+                      {% csrf_token %}
+                      <input
+                        type="hidden"
+                        name="course_id"
+                        value="{{ c.id }}"
+                      />
+                      <input type="hidden" name="action" value="register" />
+                      <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-plus-lg me-1"></i>Register
+                      </button>
+                    </form>
+                  </td>
                 </tr>
                 {% endfor %}
               </tbody>
             </table>
           </div>
+          {% endif %}
         </div>
       </div>
 
-      <!-- Timetable -->
+      <!-- Subjects / Schedule -->
       <div id="timetable" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
-            <i class="bi bi-clock me-2"></i>Weekly Timetable
+            <i class="bi bi-clock me-2"></i>My Subjects & Faculty
           </p>
           <div class="table-responsive">
-            <table class="table table-bordered text-center">
+            <table class="table table-bordered table-hover text-center">
               <thead>
                 <tr>
-                  <th>Day</th>
-                  <th>9-10</th>
-                  <th>10-11</th>
-                  <th>11-12</th>
-                  <th>1-2</th>
-                  <th>2-3</th>
-                  <th>3-4</th>
+                  <th>#</th>
+                  <th>Subject</th>
+                  <th>Course</th>
+                  <th>Faculty</th>
+                  <th>Department</th>
                 </tr>
               </thead>
               <tbody>
-                {% for row in timetable %}
+                {% for sub in subjects %}
                 <tr>
-                  <td class="fw-semibold text-primary">{{ row.day }}</td>
-                  <td>{{ row.slot1|default:"-" }}</td>
-                  <td>{{ row.slot2|default:"-" }}</td>
-                  <td>{{ row.slot3|default:"-" }}</td>
-                  <td>{{ row.slot4|default:"-" }}</td>
-                  <td>{{ row.slot5|default:"-" }}</td>
-                  <td>{{ row.slot6|default:"-" }}</td>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ sub.name }}</td>
+                  <td>{{ sub.course.name }}</td>
+                  <td>{{ sub.faculty.name|default:"Not Assigned" }}</td>
+                  <td>{{ sub.faculty.department|default:"-" }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="7" class="text-muted">
-                    No timetable available.
+                  <td colspan="5" class="text-muted">
+                    No subjects found. Please register a course first.
                   </td>
                 </tr>
                 {% endfor %}
@@ -268,7 +330,6 @@
           </div>
         </div>
       </div>
-
       <!-- Notices -->
       <div id="notices" class="card border-0 shadow-sm mb-4">
         <div class="card-body">

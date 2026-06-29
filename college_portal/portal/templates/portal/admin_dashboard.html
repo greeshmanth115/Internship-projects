@@ -170,6 +170,7 @@
                   <th>Employee ID</th>
                   <th>Department</th>
                   <th>Email</th>
+                  <th>Assigned Subjects</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -182,6 +183,22 @@
                   <td>{{ f.department }}</td>
                   <td>{{ f.email }}</td>
                   <td>
+                    {% for s in f.subjects.all %}
+                    <span class="badge bg-primary">{{ s.name }}</span>
+                    {% empty %}
+                    <span class="text-muted small">None</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-success btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#assignSubjectModal"
+                      data-faculty-id="{{ f.id }}"
+                      data-faculty-name="{{ f.name }}"
+                    >
+                      <i class="bi bi-book"></i> Assign
+                    </button>
                     <a
                       href="{% url 'edit_faculty' f.id %}"
                       class="btn btn-warning btn-sm"
@@ -199,7 +216,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                  <td colspan="6" class="text-muted">No faculty yet.</td>
+                  <td colspan="7" class="text-muted">No faculty yet.</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -507,5 +524,77 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'portal/js/script.js' %}"></script>
+    <!-- Assign Subject Modal -->
+    <div class="modal fade" id="assignSubjectModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-success text-white">
+            <h5 class="modal-title">
+              <i class="bi bi-book me-2"></i>Assign Subject to Faculty
+            </h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <form method="POST" action="{% url 'assign_subject' %}">
+            {% csrf_token %}
+            <div class="modal-body">
+              <input type="hidden" name="faculty_id" id="modalFacultyId" />
+              <p class="fw-semibold mb-3">
+                Faculty:
+                <span id="modalFacultyName" class="text-primary"></span>
+              </p>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Subject Name</label>
+                <input
+                  type="text"
+                  name="subject_name"
+                  class="form-control"
+                  placeholder="e.g. Mathematics"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Assign to Course</label>
+                <select name="course_id" class="form-select" required>
+                  <option value="">Select Course</option>
+                  {% for c in courses %}
+                  <option value="{{ c.id }}">
+                    {{ c.name }} ({{ c.code }})
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-success">
+                Assign Subject
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Pass faculty id and name into the assign modal
+      document
+        .getElementById("assignSubjectModal")
+        .addEventListener("show.bs.modal", function (e) {
+          const btn = e.relatedTarget;
+          document.getElementById("modalFacultyId").value =
+            btn.getAttribute("data-faculty-id");
+          document.getElementById("modalFacultyName").textContent =
+            btn.getAttribute("data-faculty-name");
+        });
+    </script>
   </body>
 </html>
