@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Student, Faculty, Course, Subject, Marks, Attendance, Notice, Timetable, CourseRegistration, DailyAttendance
-
+#for register 
 admin.site.register(CourseRegistration)
 admin.site.register(Student)
 admin.site.register(Faculty)
