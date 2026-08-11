@@ -19,9 +19,9 @@
     <!-- Navbar -->
     <nav class="navbar navbar-dark bg-primary fixed-top">
       <div class="container-fluid">
-        <span class="navbar-brand fw-bold"
-          ><i class="bi bi-mortarboard-fill me-2"></i>College Portal</span
-        >
+        <span class="navbar-brand fw-bold">
+          <i class="bi bi-mortarboard-fill me-2"></i>College Portal
+        </span>
         <div class="d-flex align-items-center gap-3">
           <span class="text-white small">Welcome, {{ student.name }}</span>
           <a href="{% url 'logout' %}" class="btn btn-outline-light btn-sm">
@@ -55,8 +55,8 @@
           >
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#timetable"
-            ><i class="bi bi-clock me-2"></i>Timetable</a
+          <a class="nav-link" href="#subjects"
+            ><i class="bi bi-clock me-2"></i>Subjects</a
           >
         </li>
         <li class="nav-item">
@@ -69,57 +69,59 @@
 
     <!-- Main Content -->
     <div class="main-content">
-      <!-- Profile -->
+      <!-- ── Profile ── -->
       <div id="profile" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
             <i class="bi bi-person-circle me-2"></i>Student Information
           </p>
           <div class="d-flex align-items-center gap-4 flex-wrap">
+            <!-- Profile Photo -->
             <img
               src="{% if student.photo %}{{ student.photo.url }}{% else %}https://ui-avatars.com/api/?name={{ student.name }}&background=0d6efd&color=fff&size=90{% endif %}"
               class="profile-pic"
-              alt="Profile Photo"
+              alt="Profile"
             />
-            <div class="row flex-grow-1 g-2">
+
+            <div class="row flex-grow-1 g-3">
               <div class="col-6 col-md-4">
-                <small class="text-muted">Name</small>
-                <p class="fw-semibold mb-0">{{ student.name }}</p>
+                <small class="text-muted d-block">Name</small>
+                <span class="fw-semibold">{{ student.name }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Roll Number</small>
-                <p class="fw-semibold mb-0">{{ student.roll_number }}</p>
+                <small class="text-muted d-block">Roll Number</small>
+                <span class="fw-semibold">{{ student.roll_number }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Branch</small>
-                <p class="fw-semibold mb-0">{{ student.branch }}</p>
+                <small class="text-muted d-block">Branch</small>
+                <span class="fw-semibold">{{ student.branch }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Year</small>
-                <p class="fw-semibold mb-0">{{ student.year }}</p>
+                <small class="text-muted d-block">Year</small>
+                <span class="fw-semibold">{{ student.year }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Semester</small>
-                <p class="fw-semibold mb-0">{{ student.semester }}</p>
+                <small class="text-muted d-block">Semester</small>
+                <span class="fw-semibold">{{ student.semester }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Date of Birth</small>
-                <p class="fw-semibold mb-0">{{ student.dob }}</p>
+                <small class="text-muted d-block">Date of Birth</small>
+                <span class="fw-semibold">{{ student.dob }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Email</small>
-                <p class="fw-semibold mb-0">{{ student.email }}</p>
+                <small class="text-muted d-block">Email</small>
+                <span class="fw-semibold">{{ student.email }}</span>
               </div>
               <div class="col-6 col-md-4">
-                <small class="text-muted">Phone</small>
-                <p class="fw-semibold mb-0">{{ student.phone }}</p>
+                <small class="text-muted d-block">Phone</small>
+                <span class="fw-semibold">{{ student.phone }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Marks -->
+      <!-- ── Marks ── -->
       <div id="marks" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
@@ -154,7 +156,7 @@
         </div>
       </div>
 
-      <!-- Attendance -->
+      <!-- ── Attendance ── -->
       <div id="attendance" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
@@ -193,8 +195,7 @@
         </div>
       </div>
 
-      <!-- Courses -->
-      <!-- Registered Courses -->
+      <!-- ── Registered Courses ── -->
       <div id="courses" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
@@ -202,7 +203,7 @@
           </p>
 
           <!-- Already registered -->
-          <div class="table-responsive mb-4">
+          <div class="table-responsive mb-3">
             <table class="table table-bordered table-hover text-center">
               <thead>
                 <tr>
@@ -248,9 +249,9 @@
             </table>
           </div>
 
-          <!-- Available courses to register -->
+          <!-- Available courses -->
           {% if all_courses %}
-          <p class="section-title">
+          <p class="section-title mt-3">
             <i class="bi bi-plus-circle me-2"></i>Available Courses
           </p>
           <div class="table-responsive">
@@ -292,8 +293,8 @@
         </div>
       </div>
 
-      <!-- Subjects / Schedule -->
-      <div id="timetable" class="card border-0 shadow-sm mb-4">
+      <!-- ── My Subjects & Faculty ── -->
+      <div id="subjects" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title">
             <i class="bi bi-clock me-2"></i>My Subjects & Faculty
@@ -321,7 +322,7 @@
                 {% empty %}
                 <tr>
                   <td colspan="5" class="text-muted">
-                    No subjects found. Please register a course first.
+                    No subjects yet. Please register a course first.
                   </td>
                 </tr>
                 {% endfor %}
@@ -330,7 +331,8 @@
           </div>
         </div>
       </div>
-      <!-- Notices -->
+
+      <!-- ── Notices ── -->
       <div id="notices" class="card border-0 shadow-sm mb-4">
         <div class="card-body">
           <p class="section-title"><i class="bi bi-bell me-2"></i>Notices</p>
@@ -341,9 +343,9 @@
                 <div class="card-body py-2 px-3">
                   <h6 class="fw-semibold mb-1">{{ n.title }}</h6>
                   <p class="text-muted small mb-1">{{ n.content }}</p>
-                  <small class="text-secondary"
-                    ><i class="bi bi-calendar3 me-1"></i>{{ n.date }}</small
-                  >
+                  <small class="text-secondary">
+                    <i class="bi bi-calendar3 me-1"></i>{{ n.date }}
+                  </small>
                 </div>
               </div>
             </div>

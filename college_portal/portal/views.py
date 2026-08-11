@@ -78,16 +78,25 @@ def student_dashboard(request):
     student     = get_object_or_404(Student, user=request.user)
     marks       = Marks.objects.filter(student=student)
     attendance  = Attendance.objects.filter(student=student)
-    registered  = CourseRegistration.objects.filter(student=student).select_related('course')
-    all_courses = Course.objects.exclude(id__in=registered.values_list('course_id', flat=True))
+    registered  = CourseRegistration.objects.filter(
+                      student=student
+                  ).select_related('course')
+    all_courses = Course.objects.exclude(
+                      id__in=registered.values_list('course_id', flat=True)
+                  )
     notices     = Notice.objects.all().order_by('-date')[:6]
 
-    # Auto-generate timetable from subjects linked to student's branch
-    subjects    = Subject.objects.filter(course__in=registered.values_list('course_id', flat=True))
+    # Fix — get distinct subjects only, one per subject name per course
+    registered_course_ids = registered.values_list('course_id', flat=True)
+    subjects = Subject.objects.filter(
+                   course_id__in=registered_course_ids,
+                   faculty__isnull=False   # only show subjects with assigned faculty
+               ).distinct()
 
     marks_data = [{'subject': m.subject.name, 'internal': m.internal,
                    'external': m.external, 'total': m.total} for m in marks]
-    att_data   = [{'subject': a.subject.name, 'percentage': a.percentage} for a in attendance]
+    att_data   = [{'subject': a.subject.name, 'percentage': a.percentage}
+                  for a in attendance]
 
     return render(request, 'portal/student_dashboard.html', {
         'student':      student,
@@ -103,12 +112,30 @@ def student_dashboard(request):
 # FACULTY DASHBOARD
 @login_required(login_url='login')
 def faculty_dashboard(request):
-    faculty            = get_object_or_404(Faculty, user=request.user)
-    subjects           = Subject.objects.filter(faculty=faculty)
-    students           = Student.objects.filter(branch=faculty.department)
+    # Get faculty profile linked to logged in user
+    try:
+        faculty = Faculty.objects.get(user=request.user)
+    except Faculty.DoesNotExist:
+        messages.error(request, 'Faculty profile not found. Contact admin.')
+        return redirect('login')
+
+    # Get subjects assigned to this faculty
+    subjects = Subject.objects.filter(faculty=faculty)
+
+    # Get courses linked to this faculty's subjects
+    course_ids = subjects.values_list('course_id', flat=True)
+
+    # Get students who registered those courses
+    registered_student_ids = CourseRegistration.objects.filter(
+        course_id__in=course_ids
+    ).values_list('student_id', flat=True)
+
+    students = Student.objects.filter(id__in=registered_student_ids).distinct()
+
+    # Recent attendance records by this faculty
     attendance_records = DailyAttendance.objects.filter(
-                             subject__faculty=faculty
-                         ).order_by('-date')[:20]
+        subject__faculty=faculty
+    ).order_by('-date')[:20]
 
     return render(request, 'portal/faculty_dashboard.html', {
         'faculty':            faculty,
@@ -122,17 +149,33 @@ def faculty_dashboard(request):
 @login_required(login_url='login')
 def save_marks(request):
     if request.method == 'POST':
-        faculty  = get_object_or_404(Faculty, user=request.user)
-        students = Student.objects.filter(branch=faculty.department)
+        try:
+            faculty = Faculty.objects.get(user=request.user)
+        except Faculty.DoesNotExist:
+            return redirect('login')
+
+        subjects   = Subject.objects.filter(faculty=faculty)
+        course_ids = subjects.values_list('course_id', flat=True)
+        student_ids = CourseRegistration.objects.filter(
+            course_id__in=course_ids
+        ).values_list('student_id', flat=True)
+        students = Student.objects.filter(id__in=student_ids).distinct()
+
         for s in students:
             subject_id = request.POST.get(f'subject_{s.id}')
             internal   = request.POST.get(f'internal_{s.id}', 0)
             external   = request.POST.get(f'external_{s.id}', 0)
+
             if subject_id:
                 subject = get_object_or_404(Subject, id=subject_id)
-                Marks.objects.update_or_create(student=s, subject=subject,
-                    defaults={'internal': int(internal), 'external': int(external)})
-        messages.success(request, 'Marks saved.')
+                Marks.objects.update_or_create(
+                    student=s, subject=subject,
+                    defaults={
+                        'internal': int(internal),
+                        'external': int(external)
+                    }
+                )
+        messages.success(request, 'Marks saved successfully.')
     return redirect('faculty_dashboard')
 
 
@@ -140,22 +183,33 @@ def save_marks(request):
 @login_required(login_url='login')
 def save_attendance(request):
     if request.method == 'POST':
-        faculty    = get_object_or_404(Faculty, user=request.user)
-        subject_id = request.POST.get('subject_id')
-        date       = request.POST.get('date')
-        students   = Student.objects.filter(branch=faculty.department)
-        subject    = get_object_or_404(Subject, id=subject_id)
+        try:
+            faculty = Faculty.objects.get(user=request.user)
+        except Faculty.DoesNotExist:
+            return redirect('login')
+
+        subject_id  = request.POST.get('subject_id')
+        date        = request.POST.get('date')
+        subject     = get_object_or_404(Subject, id=subject_id)
+
+        course_ids  = Subject.objects.filter(faculty=faculty).values_list('course_id', flat=True)
+        student_ids = CourseRegistration.objects.filter(
+            course_id__in=course_ids
+        ).values_list('student_id', flat=True)
+        students = Student.objects.filter(id__in=student_ids).distinct()
 
         for s in students:
             value      = request.POST.get(f'present_{s.id}', '0')
-            is_present = value == '1'   # 1 = Present, 0 = Absent
+            is_present = value == '1'
 
             DailyAttendance.objects.update_or_create(
                 student=s, subject=subject, date=date,
                 defaults={'is_present': is_present}
             )
             total   = DailyAttendance.objects.filter(student=s, subject=subject).count()
-            present = DailyAttendance.objects.filter(student=s, subject=subject, is_present=True).count()
+            present = DailyAttendance.objects.filter(
+                student=s, subject=subject, is_present=True
+            ).count()
             Attendance.objects.update_or_create(
                 student=s, subject=subject,
                 defaults={'present': present, 'total': total}
